@@ -17,11 +17,18 @@ jobs:
         run: |
           pip install buildozer cython
 
+      - name: Fix libffi clang issue
+        run: |
+          sudo ln -sf /usr/bin/clang-14 /usr/local/bin/clang
+          sudo sed -i 's/-print-multi-os-directory/-print-multi-lib/g' /usr/lib/llvm-14/bin/clang 2>/dev/null || true
+
       - name: Build APK
         run: |
           echo "y" | buildozer android debug
         env:
           BUILDOZER_WARN_ON_ROOT: 0
+          CC: clang
+          CXX: clang++
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
